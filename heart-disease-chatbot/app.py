@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import json
 import re
+import os
 import pandas as pd
 import numpy as np
 from data_agent import load_dataset, safe_exec, format_result, get_dataset_summary
@@ -26,34 +27,28 @@ st.markdown("""
   [data-testid="stSidebar"] { background:rgba(255,255,255,0.04)!important; border-right:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(12px); }
   [data-testid="stSidebar"] * { color:#e0d6ff!important; }
 
-  /* gate */
   .gate-wrap { max-width:480px; margin:6vh auto 0; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:2.5rem 2rem; text-align:center; backdrop-filter:blur(14px); }
   .gate-title { font-family:'DM Serif Display',serif; font-size:1.7rem; background:linear-gradient(90deg,#ff6b6b,#ee5a24); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0 0 0.4rem; }
   .gate-sub { color:#a89dcc; font-size:0.88rem; margin-bottom:1.4rem; line-height:1.5; }
 
-  /* header */
   .hero-title { font-family:'DM Serif Display',serif; font-size:clamp(2rem,5vw,3.2rem); background:linear-gradient(90deg,#ff6b6b,#ee5a24,#ff6b6b); background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 3s linear infinite; margin:0; }
   @keyframes shimmer { 0%{background-position:0% center} 100%{background-position:200% center} }
   .hero-sub { color:#a89dcc; font-size:0.95rem; font-weight:300; margin-top:0.4rem; }
 
-  /* bubbles */
   .msg-user { display:flex; justify-content:flex-end; margin:0.7rem 0; animation:fadeUp 0.3s ease; }
   @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
   .bubble-user { background:linear-gradient(135deg,#ee5a24,#d63031); color:#fff; border-radius:20px 20px 4px 20px; padding:0.75rem 1.1rem; max-width:70%; font-size:0.92rem; line-height:1.55; box-shadow:0 4px 18px rgba(238,90,36,0.35); }
 
-  /* data result box */
   .data-result-box { background:rgba(46,213,115,0.06); border:1px solid rgba(46,213,115,0.25); border-radius:12px; padding:0.8rem 1rem; margin:0.5rem 0; }
   .data-badge { background:rgba(46,213,115,0.15); border:1px solid rgba(46,213,115,0.4); color:#2ed573; border-radius:6px; padding:2px 8px; font-size:0.75rem; font-weight:600; display:inline-block; margin-bottom:0.5rem; }
   .code-badge { background:rgba(108,92,231,0.15); border:1px solid rgba(108,92,231,0.4); color:#a29bfe; border-radius:6px; padding:2px 8px; font-size:0.75rem; font-weight:600; display:inline-block; margin-bottom:0.5rem; }
 
-  /* stat cards */
   .stat-card { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:0.9rem; text-align:center; margin-bottom:0.6rem; }
   .stat-val { font-size:1.5rem; font-weight:600; color:#ff6b6b; }
   .stat-lbl { font-size:0.75rem; color:#a89dcc; margin-top:2px; }
 
   .key-badge { background:rgba(46,213,115,0.15); border:1px solid rgba(46,213,115,0.4); color:#2ed573; border-radius:10px; padding:6px 12px; font-size:0.8rem; text-align:center; margin-bottom:0.5rem; }
 
-  /* chat input */
   .stChatInput > div { background:rgba(255,255,255,0.06)!important; border:1px solid rgba(255,255,255,0.15)!important; border-radius:16px!important; }
   .stChatInput textarea { color:#fff!important; }
   .stChatInput button { color:#ee5a24!important; }
@@ -62,7 +57,6 @@ st.markdown("""
   ::-webkit-scrollbar { width:5px; }
   ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:10px; }
 
-  /* table styling inside chat */
   table { border-collapse:collapse; width:100%; font-size:0.82rem; }
   th { background:rgba(108,92,231,0.3); color:#d4cbff; padding:6px 10px; text-align:left; }
   td { padding:5px 10px; border-bottom:1px solid rgba(255,255,255,0.06); color:#e0d6ff; }
@@ -75,10 +69,6 @@ st.markdown("""
 GROQ_MODEL = "llama-3.3-70b-versatile"
 
 def call_groq_router(user_message: str, api_key: str) -> dict:
-    """
-    Ask Groq to route the message — returns parsed JSON dict.
-    type: 'data_query' | 'knowledge' | 'off_topic'
-    """
     payload = {
         "model": GROQ_MODEL,
         "messages": [
@@ -96,13 +86,10 @@ def call_groq_router(user_message: str, api_key: str) -> dict:
         )
         resp.raise_for_status()
         raw = resp.json()["choices"][0]["message"]["content"].strip()
-
-        # Extract JSON from response (handle markdown code fences)
         match = re.search(r'\{.*\}', raw, re.DOTALL)
         if match:
             return json.loads(match.group())
         return {"type": "knowledge", "answer": raw}
-
     except requests.exceptions.HTTPError as e:
         code = e.response.status_code
         if code == 401:
@@ -115,7 +102,6 @@ def call_groq_router(user_message: str, api_key: str) -> dict:
 
 
 def call_groq_followup(question: str, data_result: str, api_key: str) -> str:
-    """After getting data result, ask Groq to interpret it in plain English."""
     payload = {
         "model": GROQ_MODEL,
         "messages": [
@@ -201,34 +187,14 @@ if not st.session_state.api_verified:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# LOAD DATASET
+# LOAD DATASET  ← FIXED PATH (works locally AND on Streamlit Cloud)
 # ══════════════════════════════════════════════════════════════════════════════
-# if st.session_state.df is None:
-#     df = load_dataset("./heart.csv")
-#     st.session_state.df = df
-# ══════════════════════════════════════════════════════════════════════════════
-# LOAD DATASET (STREAMLIT CLOUD SAFE)
-# ══════════════════════════════════════════════════════════════════════════════
-
-@st.cache_data
-def load_data():
-    try:
-        base_path = Path(__file__).parent
-        csv_path = base_path / "heart.csv"
-
-        if not csv_path.exists():
-            return None
-
-        df = pd.read_csv(csv_path)
-        return df
-
-    except Exception as e:
-        st.error(f"Dataset loading error: {e}")
-        return None
-
-
 if st.session_state.df is None:
-    st.session_state.df = load_data()
+    # Always look for heart.csv in the same folder as this app.py file
+    # This works whether running locally or deployed on Streamlit Cloud
+    csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "heart.csv")
+    df = load_dataset(csv_path)
+    st.session_state.df = df
 
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
@@ -244,7 +210,6 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # Dataset status
     df = st.session_state.df
     if df is not None:
         st.markdown('<div class="key-badge" style="color:#74b9ff;border-color:rgba(116,185,255,0.4);background:rgba(116,185,255,0.1);">📊 heart.csv loaded ✓</div>', unsafe_allow_html=True)
@@ -325,21 +290,17 @@ def render_message(msg: dict, idx: int):
             msg_type = msg.get("msg_type", "knowledge")
 
             if msg_type == "data_query":
-                # Show data badge + explanation
                 st.markdown(f'<span class="data-badge">📊 LIVE DATA QUERY</span>', unsafe_allow_html=True)
                 if msg.get("explanation"):
                     st.markdown(f"*{msg['explanation']}*")
 
-                # Show result
                 result_text = msg.get("result", "")
                 if result_text:
                     st.markdown(result_text)
 
-                # Show interpretation
                 if msg.get("interpretation"):
                     st.info(f"💡 {msg['interpretation']}")
 
-                # Toggle code
                 code = msg.get("code", "")
                 if code:
                     show_key = f"show_code_{idx}"
@@ -355,7 +316,7 @@ def render_message(msg: dict, idx: int):
             elif msg_type == "error":
                 st.error(msg.get("content", "An error occurred."))
 
-            else:  # knowledge
+            else:
                 st.markdown(msg["content"])
 
 
@@ -399,7 +360,6 @@ def handle_question(user_input: str):
             exec_result = safe_exec(code, df)
             formatted = format_result(exec_result)
 
-            # Get plain-English interpretation
             interpretation = ""
             if exec_result["success"]:
                 with st.spinner("Interpreting result…"):
@@ -428,7 +388,7 @@ def handle_question(user_input: str):
             "content": "",
         })
 
-    else:  # error
+    else:
         st.session_state.messages.append({
             "role": "assistant",
             "msg_type": "error",
