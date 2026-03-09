@@ -204,7 +204,7 @@ if not st.session_state.api_verified:
 # LOAD DATASET
 # ══════════════════════════════════════════════════════════════════════════════
 if st.session_state.df is None:
-    df = load_dataset("heart.csv")
+    df = load_dataset("./heart.csv")
     st.session_state.df = df
 
 
