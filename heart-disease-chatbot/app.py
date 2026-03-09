@@ -22,45 +22,121 @@ st.markdown("""
   @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&family=Fira+Code&display=swap');
   html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 
-  .stApp { background: linear-gradient(135deg,#0f0c29 0%,#1a1040 40%,#24243e 100%); min-height:100vh; }
+  /* ── App background ── */
+  .stApp { background: linear-gradient(135deg,#0f0c29 0%,#1a1040 40%,#24243e 100%) !important; min-height:100vh; }
+  .stApp > div { background: transparent !important; }
+  section[data-testid="stMain"] { background: transparent !important; }
+  .block-container { background: transparent !important; }
 
-  [data-testid="stSidebar"] { background:rgba(255,255,255,0.04)!important; border-right:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(12px); }
-  [data-testid="stSidebar"] * { color:#e0d6ff!important; }
+  /* ── All regular text visible ── */
+  p, span, div, label, li { color: #e0d6ff !important; }
+  h1, h2, h3 { color: #fff !important; }
 
+  /* ── Sidebar ── */
+  [data-testid="stSidebar"] { background: rgba(15,12,41,0.95) !important; border-right:1px solid rgba(255,255,255,0.1); }
+  [data-testid="stSidebar"] * { color: #e0d6ff !important; }
+  [data-testid="stSidebar"] .stMarkdown p { color: #e0d6ff !important; }
+
+  /* ── ALL Streamlit buttons — dark styled ── */
+  .stButton > button {
+    background: rgba(255,255,255,0.08) !important;
+    color: #e0d6ff !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    border-radius: 10px !important;
+    font-size: 0.85rem !important;
+    transition: all 0.2s !important;
+  }
+  .stButton > button:hover {
+    background: rgba(238,90,36,0.25) !important;
+    border-color: rgba(238,90,36,0.6) !important;
+    color: #fff !important;
+  }
+  /* Primary button (Start Chatting) */
+  .stButton > button[kind="primary"] {
+    background: linear-gradient(135deg,#ee5a24,#d63031) !important;
+    color: #fff !important;
+    border: none !important;
+  }
+  .stButton > button[kind="primary"]:hover {
+    background: linear-gradient(135deg,#ff6b6b,#ee5a24) !important;
+  }
+
+  /* ── Sidebar buttons specifically ── */
+  [data-testid="stSidebar"] .stButton > button {
+    background: rgba(255,255,255,0.06) !important;
+    color: #e0d6ff !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+  }
+
+  /* ── Gate / API key screen ── */
   .gate-wrap { max-width:480px; margin:6vh auto 0; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:2.5rem 2rem; text-align:center; backdrop-filter:blur(14px); }
   .gate-title { font-family:'DM Serif Display',serif; font-size:1.7rem; background:linear-gradient(90deg,#ff6b6b,#ee5a24); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0 0 0.4rem; }
-  .gate-sub { color:#a89dcc; font-size:0.88rem; margin-bottom:1.4rem; line-height:1.5; }
+  .gate-sub { color:#a89dcc !important; font-size:0.88rem; margin-bottom:1.4rem; line-height:1.5; }
 
+  /* ── Header ── */
   .hero-title { font-family:'DM Serif Display',serif; font-size:clamp(2rem,5vw,3.2rem); background:linear-gradient(90deg,#ff6b6b,#ee5a24,#ff6b6b); background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 3s linear infinite; margin:0; }
   @keyframes shimmer { 0%{background-position:0% center} 100%{background-position:200% center} }
-  .hero-sub { color:#a89dcc; font-size:0.95rem; font-weight:300; margin-top:0.4rem; }
+  .hero-sub { color:#a89dcc !important; font-size:0.95rem; font-weight:300; margin-top:0.4rem; }
 
+  /* ── User bubble ── */
   .msg-user { display:flex; justify-content:flex-end; margin:0.7rem 0; animation:fadeUp 0.3s ease; }
   @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  .bubble-user { background:linear-gradient(135deg,#ee5a24,#d63031); color:#fff; border-radius:20px 20px 4px 20px; padding:0.75rem 1.1rem; max-width:70%; font-size:0.92rem; line-height:1.55; box-shadow:0 4px 18px rgba(238,90,36,0.35); }
+  .bubble-user { background:linear-gradient(135deg,#ee5a24,#d63031); color:#fff !important; border-radius:20px 20px 4px 20px; padding:0.75rem 1.1rem; max-width:70%; font-size:0.92rem; line-height:1.55; box-shadow:0 4px 18px rgba(238,90,36,0.35); }
 
-  .data-result-box { background:rgba(46,213,115,0.06); border:1px solid rgba(46,213,115,0.25); border-radius:12px; padding:0.8rem 1rem; margin:0.5rem 0; }
-  .data-badge { background:rgba(46,213,115,0.15); border:1px solid rgba(46,213,115,0.4); color:#2ed573; border-radius:6px; padding:2px 8px; font-size:0.75rem; font-weight:600; display:inline-block; margin-bottom:0.5rem; }
-  .code-badge { background:rgba(108,92,231,0.15); border:1px solid rgba(108,92,231,0.4); color:#a29bfe; border-radius:6px; padding:2px 8px; font-size:0.75rem; font-weight:600; display:inline-block; margin-bottom:0.5rem; }
+  /* ── Badges ── */
+  .data-badge { background:rgba(46,213,115,0.15); border:1px solid rgba(46,213,115,0.4); color:#2ed573 !important; border-radius:6px; padding:2px 8px; font-size:0.75rem; font-weight:600; display:inline-block; margin-bottom:0.5rem; }
+  .code-badge { background:rgba(108,92,231,0.15); border:1px solid rgba(108,92,231,0.4); color:#a29bfe !important; border-radius:6px; padding:2px 8px; font-size:0.75rem; font-weight:600; display:inline-block; margin-bottom:0.5rem; }
 
-  .stat-card { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:0.9rem; text-align:center; margin-bottom:0.6rem; }
-  .stat-val { font-size:1.5rem; font-weight:600; color:#ff6b6b; }
-  .stat-lbl { font-size:0.75rem; color:#a89dcc; margin-top:2px; }
+  /* ── Stat cards ── */
+  .stat-card { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:0.9rem; text-align:center; margin-bottom:0.6rem; }
+  .stat-val { font-size:1.5rem; font-weight:600; color:#ff6b6b !important; }
+  .stat-lbl { font-size:0.75rem; color:#a89dcc !important; margin-top:2px; }
 
-  .key-badge { background:rgba(46,213,115,0.15); border:1px solid rgba(46,213,115,0.4); color:#2ed573; border-radius:10px; padding:6px 12px; font-size:0.8rem; text-align:center; margin-bottom:0.5rem; }
+  /* ── Key / CSV badges ── */
+  .key-badge { background:rgba(46,213,115,0.15); border:1px solid rgba(46,213,115,0.4); color:#2ed573 !important; border-radius:10px; padding:6px 12px; font-size:0.8rem; text-align:center; margin-bottom:0.5rem; }
 
-  .stChatInput > div { background:rgba(255,255,255,0.06)!important; border:1px solid rgba(255,255,255,0.15)!important; border-radius:16px!important; }
-  .stChatInput textarea { color:#fff!important; }
-  .stChatInput button { color:#ee5a24!important; }
+  /* ── Chat input ── */
+  .stChatInput > div { background:rgba(255,255,255,0.07) !important; border:1px solid rgba(255,255,255,0.18) !important; border-radius:16px !important; }
+  .stChatInput textarea { color:#fff !important; background: transparent !important; }
+  .stChatInput textarea::placeholder { color: rgba(255,255,255,0.35) !important; }
+  .stChatInput button { color:#ee5a24 !important; }
 
-  hr { border-color:rgba(255,255,255,0.08)!important; }
+  /* ── Text input (API key box) ── */
+  .stTextInput > div > div > input {
+    background: rgba(255,255,255,0.07) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    border-radius: 10px !important;
+  }
+  .stTextInput > div > div > input::placeholder { color: rgba(255,255,255,0.3) !important; }
+
+  /* ── st.info box ── */
+  .stAlert { background: rgba(116,185,255,0.08) !important; border: 1px solid rgba(116,185,255,0.3) !important; color: #c8e6ff !important; }
+  .stAlert p { color: #c8e6ff !important; }
+
+  /* ── st.warning ── */
+  div[data-testid="stNotification"] p { color: #e0d6ff !important; }
+
+  /* ── Markdown text inside chat ── */
+  .stChatMessage p { color: #e0d6ff !important; }
+  .stChatMessage li { color: #e0d6ff !important; }
+  .stChatMessage code { background: rgba(255,255,255,0.1) !important; color: #a29bfe !important; }
+
+  /* ── Divider ── */
+  hr { border-color:rgba(255,255,255,0.08) !important; }
+
+  /* ── Scrollbar ── */
   ::-webkit-scrollbar { width:5px; }
   ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:10px; }
 
+  /* ── Tables ── */
   table { border-collapse:collapse; width:100%; font-size:0.82rem; }
-  th { background:rgba(108,92,231,0.3); color:#d4cbff; padding:6px 10px; text-align:left; }
-  td { padding:5px 10px; border-bottom:1px solid rgba(255,255,255,0.06); color:#e0d6ff; }
+  th { background:rgba(108,92,231,0.3) !important; color:#d4cbff !important; padding:6px 10px; text-align:left; }
+  td { padding:5px 10px; border-bottom:1px solid rgba(255,255,255,0.06); color:#e0d6ff !important; }
   tr:hover td { background:rgba(255,255,255,0.04); }
+
+  /* ── Caption / small text ── */
+  .stCaption, small { color: #8a7fb5 !important; }
 </style>
 """, unsafe_allow_html=True)
 
