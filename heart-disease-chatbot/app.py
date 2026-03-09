@@ -95,20 +95,38 @@ st.markdown("""
   /* ── Key / CSV badges ── */
   .key-badge { background:rgba(46,213,115,0.15); border:1px solid rgba(46,213,115,0.4); color:#2ed573 !important; border-radius:10px; padding:6px 12px; font-size:0.8rem; text-align:center; margin-bottom:0.5rem; }
 
-  /* ── Chat input ── */
-  .stChatInput > div { background:rgba(255,255,255,0.07) !important; border:1px solid rgba(255,255,255,0.18) !important; border-radius:16px !important; }
-  .stChatInput textarea { color:#fff !important; background: transparent !important; }
-  .stChatInput textarea::placeholder { color: rgba(255,255,255,0.35) !important; }
-  .stChatInput button { color:#ee5a24 !important; }
+  /* ── Chat input — full dark override ── */
+  .stChatInput { background: transparent !important; }
+  .stChatInput > div {
+    background: rgba(20,16,55,0.95) !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    border-radius: 16px !important;
+  }
+  .stChatInput textarea {
+    background: transparent !important;
+    color: #ffffff !important;
+    caret-color: #ff6b6b !important;
+  }
+  .stChatInput textarea::placeholder { color: rgba(200,190,255,0.45) !important; }
+  .stChatInput button { background: transparent !important; color: #ee5a24 !important; }
+  /* the bottom bar that holds the input */
+  [data-testid="stBottom"] { background: rgba(15,12,41,0.98) !important; border-top: 1px solid rgba(255,255,255,0.08) !important; }
+  [data-testid="stBottom"] > div { background: transparent !important; }
 
   /* ── Text input (API key box) ── */
-  .stTextInput > div > div > input {
-    background: rgba(255,255,255,0.07) !important;
-    color: #fff !important;
+  .stTextInput > div > div {
+    background: rgba(20,16,55,0.95) !important;
     border: 1px solid rgba(255,255,255,0.2) !important;
     border-radius: 10px !important;
   }
-  .stTextInput > div > div > input::placeholder { color: rgba(255,255,255,0.3) !important; }
+  .stTextInput > div > div > input {
+    background: transparent !important;
+    color: #ffffff !important;
+    caret-color: #ff6b6b !important;
+  }
+  .stTextInput > div > div > input::placeholder { color: rgba(200,190,255,0.4) !important; }
+  /* label above the input */
+  .stTextInput label { color: #e0d6ff !important; }
 
   /* ── st.info box ── */
   .stAlert { background: rgba(116,185,255,0.08) !important; border: 1px solid rgba(116,185,255,0.3) !important; color: #c8e6ff !important; }
