@@ -212,5 +212,5 @@ bubble        │
 ## 👤 Author
 
 **Original Project:** Kanna Vamshi Krishna  
-**Chatbot Layer:** Built with Streamlit + Anthropic Claude API
+**Chatbot Layer:** Built with Streamlit + GROK API
 
