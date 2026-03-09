@@ -203,9 +203,32 @@ if not st.session_state.api_verified:
 # ══════════════════════════════════════════════════════════════════════════════
 # LOAD DATASET
 # ══════════════════════════════════════════════════════════════════════════════
+# if st.session_state.df is None:
+#     df = load_dataset("./heart.csv")
+#     st.session_state.df = df
+# ══════════════════════════════════════════════════════════════════════════════
+# LOAD DATASET (STREAMLIT CLOUD SAFE)
+# ══════════════════════════════════════════════════════════════════════════════
+
+@st.cache_data
+def load_data():
+    try:
+        base_path = Path(__file__).parent
+        csv_path = base_path / "heart.csv"
+
+        if not csv_path.exists():
+            return None
+
+        df = pd.read_csv(csv_path)
+        return df
+
+    except Exception as e:
+        st.error(f"Dataset loading error: {e}")
+        return None
+
+
 if st.session_state.df is None:
-    df = load_dataset("./heart.csv")
-    st.session_state.df = df
+    st.session_state.df = load_data()
 
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
